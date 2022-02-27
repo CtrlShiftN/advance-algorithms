@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\libraries\Combination;
 use app\models\libraries\FileHelper;
 use app\models\libraries\NumberHelper;
 use yii\filters\AccessControl;
@@ -61,6 +62,37 @@ class GenerationController extends \yii\web\Controller
         $arrOutput = [];
         foreach ($arrInput as $key => $value) {
             $arrOutput[$key] = NumberHelper::getNextBinaryNumber($value);
+        }
+        FileHelper::writeArrayToFile($arrOutput, $outputPath);
+        return $this->render('ex1', [
+            'arrInput' => $arrInput,
+            'arrOutput' => $arrOutput,
+            'inputPath' => $inputPath,
+            'outputPath' => $outputPath
+        ]);
+    }
+
+    public function actionEx2()
+    {
+        $fileDir = './' . Url::to('/uploads/generation/ex2/');
+        $inputPath = $fileDir . 'ex2.in';
+        $outputPath = $fileDir . 'ex2.out';
+        $arrInput = FileHelper::readFileByLineAsArray($inputPath);
+        $arrOutput = [];
+        // first line in file is the number of combinations
+        $numberOfCombination = intval(trim($arrInput[0]));
+        // count output combinations
+        $countOutputCombinations = 0;
+        for ($i = 1; $i <= $numberOfCombination; $i++) {
+            // $k $n to be [$k,$n]
+            $kAndNArray = explode(" ", trim($arrInput[$i * 2 - 1]));
+            // current combination on the next line of $k an $n
+            $currentCombine = explode(" ", trim($arrInput[$i * 2]));
+            $kAndNArray = array_map('intval', $kAndNArray);
+            $currentCombine = array_map('intval', $currentCombine);
+            $arrOutput[$countOutputCombinations] = Combination::findNextCombination($kAndNArray[1], $kAndNArray[0], $currentCombine);
+            $arrOutput[$countOutputCombinations] = implode($arrOutput[$countOutputCombinations]);
+            $countOutputCombinations++;
         }
         FileHelper::writeArrayToFile($arrOutput, $outputPath);
         return $this->render('ex1', [
