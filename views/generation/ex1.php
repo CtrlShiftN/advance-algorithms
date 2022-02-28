@@ -4,7 +4,7 @@
 use app\models\libraries\NumberHelper;
 use yii\helpers\Url;
 
-$this->title = 'Bài 1';
+$this->title = 'Bài ' . $title;
 ?>
 <div class="ex1-content container py-3">
     <div class="row bg-secondary">

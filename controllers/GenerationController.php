@@ -5,6 +5,8 @@ namespace app\controllers;
 use app\models\libraries\Combination;
 use app\models\libraries\FileHelper;
 use app\models\libraries\NumberHelper;
+use app\models\libraries\Permutation;
+use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\helpers\Url;
@@ -65,6 +67,7 @@ class GenerationController extends \yii\web\Controller
         }
         FileHelper::writeArrayToFile($arrOutput, $outputPath);
         return $this->render('ex1', [
+            'title' => Yii::$app->controller->action->id,
             'arrInput' => $arrInput,
             'arrOutput' => $arrOutput,
             'inputPath' => $inputPath,
@@ -72,6 +75,9 @@ class GenerationController extends \yii\web\Controller
         ]);
     }
 
+    /**
+     * 
+     */
     public function actionEx2()
     {
         $fileDir = './' . Url::to('/uploads/generation/ex2/');
@@ -88,14 +94,82 @@ class GenerationController extends \yii\web\Controller
             $kAndNArray = explode(" ", trim($arrInput[$i * 2 - 1]));
             // current combination on the next line of $k an $n
             $currentCombine = explode(" ", trim($arrInput[$i * 2]));
+            // convert String array into int array
             $kAndNArray = array_map('intval', $kAndNArray);
             $currentCombine = array_map('intval', $currentCombine);
+            // find next combination
             $arrOutput[$countOutputCombinations] = Combination::findNextCombination($kAndNArray[1], $kAndNArray[0], $currentCombine);
+            // implode all numbers into a number
             $arrOutput[$countOutputCombinations] = implode($arrOutput[$countOutputCombinations]);
+            // raise count
             $countOutputCombinations++;
         }
+        // write to file
         FileHelper::writeArrayToFile($arrOutput, $outputPath);
+        // render to view
         return $this->render('ex1', [
+            'title' => Yii::$app->controller->action->id,
+            'arrInput' => $arrInput,
+            'arrOutput' => $arrOutput,
+            'inputPath' => $inputPath,
+            'outputPath' => $outputPath
+        ]);
+    }
+
+    public function actionEx3()
+    {
+        $fileDir = './' . Url::to('/uploads/generation/ex3/');
+        $inputPath = $fileDir . 'ex3.in';
+        $outputPath = $fileDir . 'ex3.out';
+        $arrInput = FileHelper::readFileByLineAsArray($inputPath);
+        $arrOutput = [];
+        // first line in file is the number of combinations
+        $numberOfPermutation = intval(trim($arrInput[0]));
+        // count output combinations
+        $countOutputCombinations = 0;
+        for ($i = 1; $i <= $numberOfPermutation; $i++) {
+            // current combination on the next line of $k an $n
+            $currentPermutation = array_map('intval', explode(" ", trim($arrInput[$i * 2])));
+            // find next combination
+            $arrOutput[$countOutputCombinations] = Permutation::genNextPermutation($currentPermutation);
+            // implode all numbers into a number
+            $arrOutput[$countOutputCombinations] = implode($arrOutput[$countOutputCombinations]);
+            // raise count
+            $countOutputCombinations++;
+        }
+        // write to file
+        FileHelper::writeArrayToFile($arrOutput, $outputPath);
+        // render to view
+        return $this->render('ex1', [
+            'title' => Yii::$app->controller->action->id,
+            'arrInput' => $arrInput,
+            'arrOutput' => $arrOutput,
+            'inputPath' => $inputPath,
+            'outputPath' => $outputPath
+        ]);
+    }
+
+    public function actionEx4()
+    {
+        $fileDir = './' . Url::to('/uploads/generation/ex4/');
+        $inputPath = $fileDir . 'ex4.in';
+        $outputPath = $fileDir . 'ex4.out';
+        $arrInput = FileHelper::readFileByLineAsArray($inputPath);
+        $arrOutput = [];
+        // first line in file is the number of combinations
+        $numberOfCombination = intval(trim($arrInput[0]));
+        // combination elements 
+        $arrCombinationElement = ['A', 'B'];
+        for ($i = 1; $i <= $numberOfCombination; $i++) {
+            // combination length
+            $combinationLength = intval(trim($arrInput[$i]));
+            $arrOutput[$i] = implode(" ", Combination::generateAllCombination($arrCombinationElement, $combinationLength));
+        }
+        // write to file
+        FileHelper::writeArrayToFile(array_values($arrOutput), $outputPath);
+        // render to view
+        return $this->render('ex1', [
+            'title' => Yii::$app->controller->action->id,
             'arrInput' => $arrInput,
             'arrOutput' => $arrOutput,
             'inputPath' => $inputPath,
