@@ -5,6 +5,9 @@ namespace app\models\libraries;
 class Combination
 {
     static $initArray = [];
+    static $diffCombination = [];
+    static $isStop = false;
+    static $countDiffCombination = 0;
     /**
      * generate([1,2], 2)
      *  results
@@ -78,5 +81,40 @@ class Combination
             self::initFirstCombination($k, $n);
             return self::$initArray;
         }
+    }
+
+    /**
+     * Gen next combination from initArray
+     */
+    private static function genNextDiffCombination($k, $n)
+    {
+        $i = intval($k);
+        while ($i > 0 && self::$initArray[$i] == $n - $k + $i) {
+            $i--;
+        }
+
+        if ($i > 0) {
+            ++self::$initArray[$i];
+            for ($j = $i + 1; $j <= $k; $j++) {
+                self::$initArray[$j] = self::$initArray[$j - 1] + 1;
+            }
+        } else {
+            self::$isStop = true;
+        }
+    }
+
+    /**
+     * Gen all combinations $k number with the max number is $n
+     * ex. genDiffCombination(3,5) => 123 124 125 132 134 ... 345
+     */
+    static function genDiffCombination($k, $n, $dataset = [])
+    {
+        self::$isStop = false; // after the first loop to gen all combination, the status should be true to stop
+        self::initFirstCombination($k, $n);
+        while (!self::$isStop) {
+            $dataset[] = implode("", self::$initArray);
+            self::genNextDiffCombination($k, $n);
+        }
+        return $dataset;
     }
 }

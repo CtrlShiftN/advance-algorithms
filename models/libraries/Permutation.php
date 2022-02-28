@@ -4,6 +4,10 @@ namespace app\models\libraries;
 
 class Permutation
 {
+    /**
+     * genNextPermutation([1,2,3,4,5]) => 1,2,3,5,4
+     * genNextPermutation([5,4,3,2,1]) => 1,2,3,4,5
+     */
     static function genNextPermutation($currentPermutationArray)
     {
         // Length of the array
