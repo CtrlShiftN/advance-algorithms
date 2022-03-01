@@ -131,7 +131,7 @@ class GenerationController extends \yii\web\Controller
             // current combination on the next line of $k an $n
             $currentPermutation = array_map('intval', explode(" ", trim($arrInput[$i * 2])));
             // find next combination
-            $arrOutput[$countOutputCombinations] = Permutation::genNextPermutation($currentPermutation);
+            $arrOutput[$countOutputCombinations] = Permutation::genNextPermutationFromArray($currentPermutation);
             // implode all numbers into a number
             $arrOutput[$countOutputCombinations] = implode($arrOutput[$countOutputCombinations]);
             // raise count
@@ -211,7 +211,33 @@ class GenerationController extends \yii\web\Controller
         // first line in file is the number of combinations
         $numberOfPermutation = intval(trim($arrInput[0]));
         for ($i = 1; $i <= $numberOfPermutation; $i++) {
-            
+            // length
+            $k = intval(trim($arrInput[$i]));
+            $arrOutput[$i] = implode(" ", Permutation::genAllDiffPermutation($k));
+        }
+        // write to file
+        FileHelper::writeArrayToFile(array_values($arrOutput), $outputPath);
+        // render to view
+        return $this->render('ex1', [
+            'title' => Yii::$app->controller->action->id,
+            'arrInput' => $arrInput,
+            'arrOutput' => $arrOutput,
+            'inputPath' => $inputPath,
+            'outputPath' => $outputPath
+        ]);
+    }
+    public function actionEx7()
+    {
+        $fileDir = './' . Url::to('/uploads/generation/ex7/');
+        $inputPath = $fileDir . 'ex7.in';
+        $outputPath = $fileDir . 'ex7.out';
+        $arrInput = FileHelper::readFileByLineAsArray($inputPath);
+        $arrOutput = [];
+        // first line in file is the number of combinations
+        $numberOfPermutation = intval(trim($arrInput[0]));
+        print_r(NumberHelper::genAllSumFactors(4));die;
+        for ($i = 1; $i <= $numberOfPermutation; $i++) {
+
         }
         // write to file
         // FileHelper::writeArrayToFile(array_values($arrOutput), $outputPath);

@@ -4,11 +4,14 @@ namespace app\models\libraries;
 
 class Permutation
 {
+    static $initArray = [];
+    static $isStop = false;
+
     /**
-     * genNextPermutation([1,2,3,4,5]) => 1,2,3,5,4
-     * genNextPermutation([5,4,3,2,1]) => 1,2,3,4,5
+     * genNextPermutationFromArray([1,2,3,4,5]) => 1,2,3,5,4
+     * genNextPermutationFromArray([5,4,3,2,1]) => 1,2,3,4,5
      */
-    static function genNextPermutation($currentPermutationArray)
+    static function genNextPermutationFromArray($currentPermutationArray)
     {
         // Length of the array
         $len = count($currentPermutationArray);
@@ -42,5 +45,60 @@ class Permutation
         // Reverse the elements from index + 1 to the nums.length
         $newArray = ArrayProHelper::reverse($newArray, $firstIndex + 1, $len - 1);
         return $newArray;
+    }
+
+    /**
+     * gen initArray as [1,2,3,...,$length]
+     */
+    private static function initFirstPermutation($length)
+    {
+        for ($i = 1; $i <= $length; $i++) {
+            self::$initArray[$i] = $i;
+        }
+    }
+
+    /**
+     * Gen next permutation from initArray
+     */
+    private static function genNextPermutation($length)
+    {
+        $i = $length - 1;
+        // if a[i] > a[i+1], check a[i-1]
+        while ($i > 0 && self::$initArray[$i] > self::$initArray[$i + 1]) {
+            $i--;
+        }
+        if ($i > 0) {
+            $j = $length;
+            // find the number that only smaller than the current number
+            while (self::$initArray[$j] < self::$initArray[$i]) {
+                $j--;
+            }
+            NumberHelper::swapTwoVarValues(self::$initArray[$j], self::$initArray[$i]);
+            // change position for the rest
+            $left = $i + 1;
+            $right = $length;
+            while ($left < $right) {
+                NumberHelper::swapTwoVarValues(self::$initArray[$left], self::$initArray[$right]);
+                $left++;
+                $right--;
+            }
+        } else {
+            self::$isStop = true;
+        }
+    }
+
+    /**
+     * genAllDiffPermutation(2) = 12 21
+     * genAllDiffPermutation(3) = 123 132 213 231 312 321
+     */
+    static function genAllDiffPermutation($length, $dataset = [])
+    {
+        self::$isStop = false; // after the first loop to gen all combination, the status should be true to stop
+        self::initFirstPermutation($length);
+        while (!self::$isStop) {
+            $dataset[] = implode("", self::$initArray);
+            self::genNextPermutation($length);
+        }
+        return $dataset;
     }
 }
