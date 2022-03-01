@@ -201,4 +201,29 @@ class GenerationController extends \yii\web\Controller
             'outputPath' => $outputPath
         ]);
     }
+    public function actionEx6()
+    {
+        $fileDir = './' . Url::to('/uploads/generation/ex6/');
+        $inputPath = $fileDir . 'ex6.in';
+        $outputPath = $fileDir . 'ex6.out';
+        $arrInput = FileHelper::readFileByLineAsArray($inputPath);
+        $arrOutput = [];
+        // first line in file is the number of combinations
+        $numberOfCombination = intval(trim($arrInput[0]));
+        for ($i = 1; $i <= $numberOfCombination; $i++) {
+            // combination $k and $n
+            $kAndNCombination = array_map('intval', explode(" ", trim($arrInput[$i])));
+            $arrOutput[$i] = implode(" ", Combination::genDiffCombination($kAndNCombination[1], $kAndNCombination[0]));
+        }
+        // write to file
+        FileHelper::writeArrayToFile(array_values($arrOutput), $outputPath);
+        // render to view
+        return $this->render('ex1', [
+            'title' => Yii::$app->controller->action->id,
+            'arrInput' => $arrInput,
+            'arrOutput' => $arrOutput,
+            'inputPath' => $inputPath,
+            'outputPath' => $outputPath
+        ]);
+    }
 }
