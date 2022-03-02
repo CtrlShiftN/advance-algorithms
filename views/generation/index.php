@@ -45,8 +45,5 @@ $this->title = 'Generation Algorithms Model';
         <div class="col px-3 py-3">
             <a href="<?= Url::toRoute('generation/ex12') ?>" class="btn btn-success">Bài 12</a>
         </div>
-        <div class="col px-3 py-3">
-            <a href="<?= Url::toRoute('generation/ex13') ?>" class="btn btn-success">Bài 13</a>
-        </div>
     </div>
 </div>

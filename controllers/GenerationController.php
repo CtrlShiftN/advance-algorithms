@@ -2,8 +2,10 @@
 
 namespace app\controllers;
 
+use app\models\libraries\CharacterHelper;
 use app\models\libraries\Combination;
 use app\models\libraries\FileHelper;
+use app\models\libraries\GrayBinConvertHelper;
 use app\models\libraries\NumberHelper;
 use app\models\libraries\Permutation;
 use Yii;
@@ -86,10 +88,10 @@ class GenerationController extends \yii\web\Controller
         $arrInput = FileHelper::readFileByLineAsArray($inputPath);
         $arrOutput = [];
         // first line in file is the number of combinations
-        $numberOfCombination = intval(trim($arrInput[0]));
+        $numberOfProcessLine = intval(trim($arrInput[0]));
         // count output combinations
         $countOutputCombinations = 0;
-        for ($i = 1; $i <= $numberOfCombination; $i++) {
+        for ($i = 1; $i <= $numberOfProcessLine; $i++) {
             // $k $n to be [$k,$n]
             $kAndNArray = explode(" ", trim($arrInput[$i * 2 - 1]));
             // current combination on the next line of $k an $n
@@ -124,10 +126,10 @@ class GenerationController extends \yii\web\Controller
         $arrInput = FileHelper::readFileByLineAsArray($inputPath);
         $arrOutput = [];
         // first line in file is the number of combinations
-        $numberOfPermutation = intval(trim($arrInput[0]));
+        $numberOfProcessLine = intval(trim($arrInput[0]));
         // count output combinations
         $countOutputCombinations = 0;
-        for ($i = 1; $i <= $numberOfPermutation; $i++) {
+        for ($i = 1; $i <= $numberOfProcessLine; $i++) {
             // current combination on the next line of $k an $n
             $currentPermutation = array_map('intval', explode(" ", trim($arrInput[$i * 2])));
             // find next combination
@@ -157,10 +159,10 @@ class GenerationController extends \yii\web\Controller
         $arrInput = FileHelper::readFileByLineAsArray($inputPath);
         $arrOutput = [];
         // first line in file is the number of combinations
-        $numberOfCombination = intval(trim($arrInput[0]));
+        $numberOfProcessLine = intval(trim($arrInput[0]));
         // combination elements 
         $arrCombinationElement = ['A', 'B'];
-        for ($i = 1; $i <= $numberOfCombination; $i++) {
+        for ($i = 1; $i <= $numberOfProcessLine; $i++) {
             // combination length
             $combinationLength = intval(trim($arrInput[$i]));
             $arrOutput[$i] = implode(" ", Combination::generateAllCombination($arrCombinationElement, $combinationLength));
@@ -184,8 +186,8 @@ class GenerationController extends \yii\web\Controller
         $arrInput = FileHelper::readFileByLineAsArray($inputPath);
         $arrOutput = [];
         // first line in file is the number of combinations
-        $numberOfCombination = intval(trim($arrInput[0]));
-        for ($i = 1; $i <= $numberOfCombination; $i++) {
+        $numberOfProcessLine = intval(trim($arrInput[0]));
+        for ($i = 1; $i <= $numberOfProcessLine; $i++) {
             // combination $k and $n
             $kAndNCombination = array_map('intval', explode(" ", trim($arrInput[$i])));
             $arrOutput[$i] = implode(" ", Combination::genDiffCombination($kAndNCombination[1], $kAndNCombination[0]));
@@ -209,8 +211,8 @@ class GenerationController extends \yii\web\Controller
         $arrInput = FileHelper::readFileByLineAsArray($inputPath);
         $arrOutput = [];
         // first line in file is the number of combinations
-        $numberOfPermutation = intval(trim($arrInput[0]));
-        for ($i = 1; $i <= $numberOfPermutation; $i++) {
+        $numberOfProcessLine = intval(trim($arrInput[0]));
+        for ($i = 1; $i <= $numberOfProcessLine; $i++) {
             // length
             $k = intval(trim($arrInput[$i]));
             $arrOutput[$i] = implode(" ", Permutation::genAllDiffPermutation($k));
@@ -234,18 +236,145 @@ class GenerationController extends \yii\web\Controller
         $arrInput = FileHelper::readFileByLineAsArray($inputPath);
         $arrOutput = [];
         // first line in file is the number of combinations
-        $numberOfPermutation = intval(trim($arrInput[0]));
-        print_r(NumberHelper::genAllSumFactors(4));die;
-        for ($i = 1; $i <= $numberOfPermutation; $i++) {
-
+        $numberOfProcessLine = intval(trim($arrInput[0]));
+        for ($i = 1; $i <= $numberOfProcessLine; $i++) {
+            // int that needs to be split
+            $currentInt = intval(trim($arrInput[$i]));
+            $arrOutput[$i] = implode(" ", NumberHelper::genAllSumFactors($currentInt));
         }
         // write to file
-        // FileHelper::writeArrayToFile(array_values($arrOutput), $outputPath);
+        FileHelper::writeArrayToFile(array_values($arrOutput), $outputPath);
         // render to view
         return $this->render('ex1', [
             'title' => Yii::$app->controller->action->id,
             'arrInput' => $arrInput,
             'arrOutput' => $arrOutput,
+            'inputPath' => $inputPath,
+            'outputPath' => $outputPath
+        ]);
+    }
+    public function actionEx8()
+    {
+        $fileDir = './' . Url::to('/uploads/generation/ex8/');
+        $inputPath = $fileDir . 'ex8.in';
+        $outputPath = $fileDir . 'ex8.out';
+        $arrInput = FileHelper::readFileByLineAsArray($inputPath);
+        $arrOutput = [];
+        // first line in file is the number of combinations
+        $numberOfProcessLine = intval(trim($arrInput[0]));
+        for ($i = 1; $i <= $numberOfProcessLine; $i++) {
+            // length
+            $k = intval(trim($arrInput[$i]));
+            $arrOutput[$i] = implode(" ", array_reverse(Permutation::genAllDiffPermutation($k)));
+        }
+        // write to file
+        FileHelper::writeArrayToFile(array_values($arrOutput), $outputPath);
+        // render to view
+        return $this->render('ex1', [
+            'title' => Yii::$app->controller->action->id,
+            'arrInput' => $arrInput,
+            'arrOutput' => $arrOutput,
+            'inputPath' => $inputPath,
+            'outputPath' => $outputPath
+        ]);
+    }
+    public function actionEx9()
+    {
+        $fileDir = './' . Url::to('/uploads/generation/ex9/');
+        $inputPath = $fileDir . 'ex9.in';
+        $outputPath = $fileDir . 'ex9.out';
+        $arrInput = FileHelper::readFileByLineAsArray($inputPath);
+        $arrOutput = [];
+        // first line in file is the number of combinations
+        $numberOfProcessLine = intval(trim($arrInput[0]));
+        for ($i = 1; $i <= $numberOfProcessLine; $i++) {
+            // get length of Gray arr to gen
+            $length = intval(trim($arrInput[$i]));
+            // gen all fray number
+            $arrOutput[$i] = implode(" ", NumberHelper::genGrayBin($length));
+        }
+        // write to file
+        FileHelper::writeArrayToFile(array_values($arrOutput), $outputPath);
+        // render to view
+        return $this->render('ex1', [
+            'title' => Yii::$app->controller->action->id,
+            'arrInput' => $arrInput,
+            'arrOutput' => $arrOutput,
+            'inputPath' => $inputPath,
+            'outputPath' => $outputPath
+        ]);
+    }
+    public function actionEx10()
+    {
+        $fileDir = './' . Url::to('/uploads/generation/ex10/');
+        $inputPath = $fileDir . 'ex10.in';
+        $outputPath = $fileDir . 'ex10.out';
+        $arrInput = FileHelper::readFileByLineAsArray($inputPath);
+        $arrOutput = [];
+        // first line in file is the number of combinations
+        $numberOfProcessLine = intval(trim($arrInput[0]));
+        for ($i = 1; $i <= $numberOfProcessLine; $i++) {
+            // get length of Gray arr to gen
+            $binaryNumber = trim($arrInput[$i]);
+            // gen all fray number
+            $arrOutput[$i] = GrayBinConvertHelper::binarytoGray($binaryNumber);
+        }
+        // write to file
+        FileHelper::writeArrayToFile(array_values($arrOutput), $outputPath);
+        // render to view
+        return $this->render('ex1', [
+            'title' => Yii::$app->controller->action->id,
+            'arrInput' => $arrInput,
+            'arrOutput' => $arrOutput,
+            'inputPath' => $inputPath,
+            'outputPath' => $outputPath
+        ]);
+    }
+    public function actionEx11()
+    {
+        $fileDir = './' . Url::to('/uploads/generation/ex11/');
+        $inputPath = $fileDir . 'ex11.in';
+        $outputPath = $fileDir . 'ex11.out';
+        $arrInput = FileHelper::readFileByLineAsArray($inputPath);
+        $arrOutput = [];
+        // first line in file is the number of combinations
+        $numberOfProcessLine = intval(trim($arrInput[0]));
+        for ($i = 1; $i <= $numberOfProcessLine; $i++) {
+            // get length of Gray arr to gen
+            $grayNumber = trim($arrInput[$i]);
+            // gen all fray number
+            $arrOutput[$i] = GrayBinConvertHelper::graytoBinary($grayNumber);
+        }
+        // write to file
+        FileHelper::writeArrayToFile(array_values($arrOutput), $outputPath);
+        // render to view
+        return $this->render('ex1', [
+            'title' => Yii::$app->controller->action->id,
+            'arrInput' => $arrInput,
+            'arrOutput' => $arrOutput,
+            'inputPath' => $inputPath,
+            'outputPath' => $outputPath
+        ]);
+    }
+
+    public function actionEx12()
+    {
+        $fileDir = './' . Url::to('/uploads/generation/ex12/');
+        $inputPath = $fileDir . 'ex12.in';
+        $outputPath = $fileDir . 'ex12.out';
+        $arrInput = FileHelper::readFileByLineAsArray($inputPath);
+        $arrOutput = [];
+        // first line in file is binary length and occurrence
+        $arrLengthAndOccurrence = array_map('intval', explode(" ", trim($arrInput[0])));
+        $arrSpecialAB = CharacterHelper::getSpecialAB($arrLengthAndOccurrence[0], $arrLengthAndOccurrence[1]);
+        $arrOutput[] = implode(" ", $arrSpecialAB);
+        // write to file
+        FileHelper::writeArrayToFileWithCountLine(array_values($arrOutput), $outputPath, strval(count($arrSpecialAB)));
+        // render to view
+        return $this->render('ex1', [
+            'title' => Yii::$app->controller->action->id,
+            'arrInput' => $arrInput,
+            'arrOutput' => FileHelper::readFileByLineAsArray($outputPath),
             'inputPath' => $inputPath,
             'outputPath' => $outputPath
         ]);

@@ -6,7 +6,6 @@ class NumberHelper
 {
     static $arrSum = [];
     static $isStop = false;
-    static $k;
 
     /**
      * getNextBinaryNumber(010101) = 010110
@@ -55,30 +54,24 @@ class NumberHelper
      */
     private static function initFirstSum($number)
     {
-        self::$k = 1;
-        self::$arrSum[self::$k] = $number;
+        self::$arrSum[1] = $number;
+        for ($i = 2; $i <= $number; $i++) {
+            self::$arrSum[$i] = 0;
+        }
     }
 
     private static function genNextSum($number)
     {
-        $i = self::$k;
+        $i = $number;
         // run from the last, if a[i] = 0 | 1, check the next position
-        while ($i > 0 && (self::$arrSum[$i] == 1)) $i--;
-        if ($i > 0) {
-            self::$arrSum[$i] = self::$arrSum[$i] - 1;
-            $D = self::$k - $i + 1;
-            $R = $D / self::$arrSum[$i];
-            $S = $D % self::$arrSum[$i];
-            self::$k = $i;
-            if ($R > 0) {
-                for ($j = $i + 1; $j <= $i + $R; $j++) {
-                    self::$arrSum[$j] = self::$arrSum[$i];
-                }
-                self::$k = self::$k + $R;
-            }
-            if ($S > 0) {
-                self::$k = self::$k + 1;
-                self::$arrSum[self::$k] = $S;
+        while ($i > 0 && (self::$arrSum[$i] == 1 || self::$arrSum[$i] == 0)) $i--;
+        if ($i > 0 && $i <= $number) {
+            if (self::$arrSum[$i + 1] <= 1) {
+                self::$arrSum[$i] = self::$arrSum[$i] - 1;
+                array_push(self::$arrSum, 1);
+            } else {
+                self::$arrSum[$i] = self::$arrSum[$i] - 1;
+                self::$arrSum[$i + 1] = self::$arrSum[$i + 1] + 1;
             }
         } else {
             self::$isStop = true;
@@ -91,11 +84,47 @@ class NumberHelper
     static function genAllSumFactors($number, $dataset = [])
     {
         self::$isStop = false;
+        self::$arrSum = [];
         self::initFirstSum($number);
         while (!self::$isStop) {
             ksort(self::$arrSum);
-            $dataset[] = implode(" ", self::$arrSum);
+            $dataset[] = "(" . implode(" ", array_filter(self::$arrSum, function ($value) {
+                return $value >= 1;
+            })) . ")";
             self::genNextSum($number);
+        }
+        return $dataset;
+    }
+
+    /**
+     * genGrayBin(2) = 00 01 11 10
+     * genGrayBin(3) = 00 001 011 010 110 111 101 100
+     */
+    static function genGrayBin($length, $dataset = [])
+    {
+        // base case
+        if ($length <= 0) {
+            return;
+        }
+
+        // start with one-bit pattern
+        array_push($dataset, 0);
+        array_push($dataset, 1);
+
+        // Every iteration of the loop, gen 2*$i codes from previously generated $i codes
+        for ($i = 2; $i < (1 << $length); $i = $i << 1) {
+            // Add previously code again to $dataset
+            for ($j=$i-1; $j >= 0; $j--) { 
+                array_push($dataset,$dataset[$j]);
+            }
+            // Append 0 to the first half
+            for ($j=0; $j < $i; $j++) { 
+                $dataset[$j] = 0 . $dataset[$j];
+            }
+            // append 1 to the second half
+            for ($j=$i; $j < $i*2; $j++) { 
+                $dataset[$j] = 1 . $dataset[$j];
+            }
         }
         return $dataset;
     }
