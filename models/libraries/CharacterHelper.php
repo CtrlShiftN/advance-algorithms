@@ -61,6 +61,10 @@ class CharacterHelper
         }
         return $maxOccurence > $countOccurrence ? $maxOccurence : $countOccurrence;
     }
+
+    /**
+     * Gen the set of binary strings which contain N continuous occurrences
+     */
     static function genBinaryWithContinuousOccurrence($length, $occurrence, $dataset = [])
     {
         self::$isStop = false;
@@ -74,6 +78,9 @@ class CharacterHelper
         return array_reverse($dataset);
     }
 
+    /**
+     * replaceAAndBIntoBinChar([1,1,0,1]) = [A, A, B, A]
+     */
     private static function replaceAAndBIntoBinChar($binaryArray, $dataset = [])
     {
         foreach ($binaryArray as $key => $value) {
@@ -85,6 +92,15 @@ class CharacterHelper
         return $dataset;
     }
 
+    /**
+     * getSpecialAB(5, 3)
+     *  return 
+     *      AAABA
+     *      AAABB
+     *      ABAAA
+     *      BAAAB
+     *      BBAAA
+     */
     static function getSpecialAB($length, $occurrence, $dataset = [])
     {
         $dataset = self::genBinaryWithContinuousOccurrence($length, $occurrence);
